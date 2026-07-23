@@ -9,13 +9,14 @@ const ChatInput = z.object({
   crop: z.string().optional().default(""),
   topic: z.string().optional().default(""),
   urgency: z.string().optional().default(""),
+  province: z.string().optional().default(""),
   message: z.string().min(1),
 });
 
 export const chatSend = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ChatInput.parse(data))
   .handler(async ({ data }) => {
-    const { callAI, AIGatewayError } = await import("./ai.server");
+    const { callAIJSON, AIGatewayError } = await import("./ai.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let threadId = data.threadId ?? null;
@@ -47,8 +48,23 @@ export const chatSend = createServerFn({ method: "POST" })
       content: data.message,
     });
 
-    const system = `You are an agricultural advisor for a South African farm team. Give practical, actionable advice about crop health, pests, weather prep, and farm operations. Use plain language. When useful, mention local South African context (climate zones, seasons, common crops like maize, citrus, wine grapes, wheat). Always remind users to verify critical decisions with a local agricultural expert.
-Context — Field: ${data.field || "unspecified"}. Crop: ${data.crop || "unspecified"}. Topic: ${data.topic || "unspecified"}. Urgency: ${data.urgency || "unspecified"}.`;
+    const system = `You are an agricultural advisor for a South African farm team in ${data.province || "South Africa"}. Give practical, province-specific advice. Any money uses South African Rand (R), never $.
+
+Return STRICT JSON only. No markdown. Schema:
+{
+  "headline": string,                     // one plain-language sentence answering the question
+  "location": string,                     // e.g. "Polokwane, Limpopo" — infer from province + field/crop when possible
+  "metrics": [                            // 2-4 quick visual metrics (0-100). Pick meaningful ones like "Crop yield outlook", "Pest pressure", "Water stress", "Soil health".
+    { "label": string, "value": number, "tone": "good"|"warn"|"bad" }
+  ],
+  "recommendations": {
+    "fertilizers": string[],              // 2-4 short bullets
+    "crop_protection": string[]           // 2-4 short bullets
+  },
+  "summary": string[]                     // 2-4 short "overall / the crop / the weather" bullets
+}
+Keep every string short and plain — a farmer will read this on a phone in the field.
+Context — Field: ${data.field || "unspecified"}. Crop: ${data.crop || "unspecified"}. Topic: ${data.topic || "unspecified"}. Urgency: ${data.urgency || "unspecified"}. Province: ${data.province || "unspecified"}.`;
 
     const messages = [
       { role: "system" as const, content: system },
@@ -60,18 +76,20 @@ Context — Field: ${data.field || "unspecified"}. Crop: ${data.crop || "unspeci
     ];
 
     try {
-      const reply = await callAI(messages);
+      const parsed = await callAIJSON<unknown>(messages);
+      const replyJson = JSON.stringify(parsed);
       await supabaseAdmin.from("chat_messages").insert({
         thread_id: threadId,
         role: "assistant",
-        content: reply,
+        content: replyJson,
       });
-      return { threadId, reply };
+      return { threadId, reply: replyJson };
     } catch (e) {
       if (e instanceof AIGatewayError) throw new Error(e.message);
       throw e;
     }
   });
+
 
 export const updateChatMessage = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>

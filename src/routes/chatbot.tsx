@@ -4,27 +4,125 @@ import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { chatSend, updateChatMessage } from "@/lib/ai.functions";
+import { chatSend } from "@/lib/ai.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Pencil, Check } from "lucide-react";
+import { useProvince } from "@/hooks/use-province";
+import { Send, MapPin, Sprout, Shield, Leaf } from "lucide-react";
 
 export const Route = createFileRoute("/chatbot")({
   head: () => ({
     meta: [
       { title: "AI Chatbot | Agri-Assist" },
-      { name: "description", content: "Ask the farm AI about crop health, pests, and weather prep." },
+      { name: "description", content: "Ask the farm AI about crop health, pests, and weather prep — with visual answers." },
       { property: "og:title", content: "AI Chatbot | Agri-Assist" },
-      { property: "og:description", content: "Ask the farm AI about crop health, pests, and weather prep." },
+      { property: "og:description", content: "Ask the farm AI about crop health, pests, and weather prep — with visual answers." },
     ],
   }),
   component: ChatPage,
 });
 
 type Msg = { id: string; role: string; content: string };
+type Structured = {
+  headline: string;
+  location: string;
+  metrics: Array<{ label: string; value: number; tone: "good" | "warn" | "bad" }>;
+  recommendations: { fertilizers: string[]; crop_protection: string[] };
+  summary: string[];
+};
+
+function tryParse(content: string): Structured | null {
+  try {
+    const p = JSON.parse(content);
+    if (p && typeof p === "object" && "metrics" in p && "recommendations" in p) return p as Structured;
+  } catch {}
+  return null;
+}
+
+function ProgressRing({ value, tone }: { value: number; tone: "good" | "warn" | "bad" }) {
+  const v = Math.max(0, Math.min(100, value));
+  const color = tone === "good" ? "var(--primary)" : tone === "warn" ? "var(--amber)" : "var(--rust)";
+  const r = 30;
+  const c = 2 * Math.PI * r;
+  const off = c - (v / 100) * c;
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" className="flex-shrink-0">
+      <circle cx="40" cy="40" r={r} stroke="var(--border-color)" strokeWidth="8" fill="none" />
+      <circle
+        cx="40" cy="40" r={r}
+        stroke={color} strokeWidth="8" fill="none" strokeLinecap="round"
+        strokeDasharray={c} strokeDashoffset={off}
+        transform="rotate(-90 40 40)"
+      />
+      <text x="40" y="45" textAnchor="middle" fill="var(--foreground)" fontSize="16" fontWeight="600" fontFamily="Commit Mono">
+        {v}%
+      </text>
+    </svg>
+  );
+}
+
+function StructuredReply({ data }: { data: Structured }) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <p className="text-base font-semibold leading-snug">{data.headline}</p>
+        {data.location && (
+          <div className="mt-1 inline-flex items-center gap-1 text-xs text-[color:var(--soft)]">
+            <MapPin className="w-3 h-3" /> {data.location}
+          </div>
+        )}
+      </div>
+
+      {data.metrics?.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {data.metrics.map((m, i) => (
+            <div key={i} className="rounded-[12px] border border-border bg-[color:var(--surface-alt)] p-3 flex items-center gap-3">
+              <ProgressRing value={m.value} tone={m.tone} />
+              <div className="min-w-0">
+                <div className="text-xs text-[color:var(--soft)] uppercase tracking-wide">{m.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {(data.recommendations?.fertilizers?.length || data.recommendations?.crop_protection?.length) && (
+        <div className="grid md:grid-cols-2 gap-3">
+          <div className="rounded-[12px] border border-border bg-[color:var(--surface-alt)] p-4">
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
+              <Sprout className="w-4 h-4 text-primary" /> Fertilizers
+            </div>
+            <ul className="space-y-1.5 text-sm text-[color:var(--soft)] list-disc list-inside">
+              {data.recommendations.fertilizers.map((r, i) => <li key={i}>{r}</li>)}
+            </ul>
+          </div>
+          <div className="rounded-[12px] border border-border bg-[color:var(--surface-alt)] p-4">
+            <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
+              <Shield className="w-4 h-4 text-[color:var(--amber)]" /> Crop protection
+            </div>
+            <ul className="space-y-1.5 text-sm text-[color:var(--soft)] list-disc list-inside">
+              {data.recommendations.crop_protection.map((r, i) => <li key={i}>{r}</li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {data.summary?.length > 0 && (
+        <div className="rounded-[12px] border border-border p-4">
+          <div className="flex items-center gap-2 mb-2 text-sm font-semibold">
+            <Leaf className="w-4 h-4 text-primary" /> Summary
+          </div>
+          <ul className="space-y-1.5 text-sm text-[color:var(--soft)] list-disc list-inside">
+            {data.summary.map((s, i) => <li key={i}>{s}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ChatPage() {
   const send = useServerFn(chatSend);
-  const updateMsg = useServerFn(updateChatMessage);
+  const { province } = useProvince();
 
   const [field, setField] = useState("");
   const [crop, setCrop] = useState("");
@@ -35,8 +133,6 @@ function ChatPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,11 +154,10 @@ function ChatPage() {
     setErr("");
     const userMsg = input.trim();
     setInput("");
-    // optimistic
     setMessages((m) => [...m, { id: "tmp-" + Date.now(), role: "user", content: userMsg }]);
     try {
       const res = await send({
-        data: { threadId, field, crop, topic, urgency, message: userMsg },
+        data: { threadId, field, crop, topic, urgency, province, message: userMsg },
       });
       setThreadId(res.threadId);
       await refresh(res.threadId);
@@ -70,16 +165,6 @@ function ChatPage() {
       setErr(e instanceof Error ? e.message : "Couldn't send that — try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const saveEdit = async (id: string) => {
-    try {
-      await updateMsg({ data: { id, content: editText } });
-      setMessages((m) => m.map((x) => (x.id === id ? { ...x, content: editText } : x)));
-      setEditingId(null);
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "Couldn't save your edit.");
     }
   };
 
@@ -109,59 +194,47 @@ function ChatPage() {
             </Select>
           </div>
         </div>
-      </Card>
-
-      <Card className="mb-4 min-h-64">
-        {messages.length === 0 && !loading && (
-          <p className="text-[color:var(--soft)] text-center py-10 text-sm">
-            Ask a question below to get started.
-          </p>
-        )}
-        <div className="space-y-4">
-          {messages.map((m) => (
-            <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`max-w-[85%] rounded-[14px] px-4 py-3 ${
-                  m.role === "user"
-                    ? "bg-[color:var(--deep-green)] text-foreground"
-                    : "bg-[color:var(--surface-alt)] border border-border"
-                }`}
-              >
-                {editingId === m.id ? (
-                  <div className="space-y-2">
-                    <Textarea value={editText} onChange={(e) => setEditText(e.target.value)} className="min-h-24" />
-                    <div className="flex gap-2">
-                      <Button variant="primary" onClick={() => saveEdit(m.id)}>
-                        <Check className="w-4 h-4" /> Save
-                      </Button>
-                      <Button variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="prose prose-invert max-w-none text-[15px] leading-relaxed">
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
-                    </div>
-                    {!m.id.startsWith("tmp-") && (
-                      <button
-                        onClick={() => {
-                          setEditingId(m.id);
-                          setEditText(m.content);
-                        }}
-                        className="mt-2 text-xs text-[color:var(--soft)] hover:text-foreground inline-flex items-center gap-1"
-                      >
-                        <Pencil className="w-3 h-3" /> Edit
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-          {loading && <Loader label="Thinking…" />}
-          <div ref={endRef} />
+        <div className="mt-3 text-xs text-[color:var(--faint)] inline-flex items-center gap-1">
+          <MapPin className="w-3 h-3" /> Advice tuned to {province}
         </div>
       </Card>
+
+      <div className="space-y-4 mb-4">
+        {messages.length === 0 && !loading && (
+          <Card>
+            <p className="text-[color:var(--soft)] text-center py-8 text-sm">
+              Ask a question below — you'll get a visual answer with metrics and next steps.
+            </p>
+          </Card>
+        )}
+        {messages.map((m) => {
+          if (m.role === "user") {
+            return (
+              <div key={m.id} className="flex justify-end">
+                <div className="max-w-[85%] rounded-[14px] px-4 py-3 bg-[color:var(--deep-green)] text-foreground text-sm">
+                  {m.content}
+                </div>
+              </div>
+            );
+          }
+          const structured = tryParse(m.content);
+          return (
+            <div key={m.id} className="accent-card accent-bar-green">
+              {structured ? (
+                <StructuredReply data={structured} />
+              ) : (
+                <div className="prose prose-invert max-w-none text-[15px] leading-relaxed">
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {loading && (
+          <Card><Loader label="Thinking…" /></Card>
+        )}
+        <div ref={endRef} />
+      </div>
 
       <Card>
         <Label>Your question</Label>

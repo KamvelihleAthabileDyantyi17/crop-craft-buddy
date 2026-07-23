@@ -10,7 +10,10 @@ import {
   Menu,
   X,
   Leaf,
+  MapPin,
+  PackageOpen,
 } from "lucide-react";
+import { PROVINCES, useProvince } from "@/hooks/use-province";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -19,7 +22,27 @@ const NAV = [
   { to: "/research", label: "Research", icon: BookOpen },
   { to: "/meetings", label: "Meeting Notes", icon: ClipboardList },
   { to: "/email", label: "Email Generator", icon: Mail },
+  { to: "/stock", label: "Stock Tracker", icon: PackageOpen },
 ] as const;
+
+function ProvincePicker({ compact = false }: { compact?: boolean }) {
+  const { province, setProvince } = useProvince();
+  return (
+    <label className={`flex items-center gap-2 rounded-[10px] border border-border bg-[color:var(--surface-alt)] px-3 ${compact ? "h-10" : "h-11"} text-sm`}>
+      <MapPin className="w-4 h-4 text-primary" />
+      <span className="text-[color:var(--soft)] hidden sm:inline">Location</span>
+      <select
+        value={province}
+        onChange={(e) => setProvince(e.target.value)}
+        className="bg-transparent focus:outline-none text-foreground pr-1"
+      >
+        {PROVINCES.map((p) => (
+          <option key={p} value={p}>{p}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 export function AppLayout({ children, title }: { children: ReactNode; title: string }) {
   const [open, setOpen] = useState(false);
@@ -33,13 +56,16 @@ export function AppLayout({ children, title }: { children: ReactNode; title: str
           <Leaf className="w-5 h-5 text-primary" />
           <span className="font-semibold">Agri-Assist</span>
         </div>
-        <button
-          onClick={() => setOpen(!open)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="tap-target min-w-12 flex items-center justify-center rounded-md hover:bg-surface"
-        >
-          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <ProvincePicker compact />
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="tap-target min-w-12 flex items-center justify-center rounded-md hover:bg-surface"
+          >
+            {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </header>
 
       {/* Sidebar */}
@@ -77,7 +103,11 @@ export function AppLayout({ children, title }: { children: ReactNode; title: str
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <main className="flex-1 px-4 md:px-8 py-6 md:py-8 max-w-5xl w-full mx-auto">
+        <div className="hidden md:flex items-center justify-between px-8 pt-6">
+          <div />
+          <ProvincePicker />
+        </div>
+        <main className="flex-1 px-4 md:px-8 py-6 md:py-6 max-w-5xl w-full mx-auto">
           <h1 className="text-2xl md:text-3xl font-semibold mb-6">{title}</h1>
           {children}
         </main>

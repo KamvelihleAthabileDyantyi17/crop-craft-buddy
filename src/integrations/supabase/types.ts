@@ -166,6 +166,42 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_entries: {
+        Row: {
+          action: string
+          category: string
+          created_at: string
+          entry_month: string
+          id: string
+          item_name: string
+          notes: string | null
+          quantity: number
+          unit_price_rands: number
+        }
+        Insert: {
+          action: string
+          category: string
+          created_at?: string
+          entry_month: string
+          id?: string
+          item_name: string
+          notes?: string | null
+          quantity?: number
+          unit_price_rands?: number
+        }
+        Update: {
+          action?: string
+          category?: string
+          created_at?: string
+          entry_month?: string
+          id?: string
+          item_name?: string
+          notes?: string | null
+          quantity?: number
+          unit_price_rands?: number
+        }
+        Relationships: []
+      }
       task_batches: {
         Row: {
           created_at: string
