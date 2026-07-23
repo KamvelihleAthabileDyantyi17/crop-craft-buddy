@@ -77,24 +77,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Agri-Assist Workspace" },
+      { title: "Dashboard | Agri-Assist Workspace" },
       {
         name: "description",
         content:
-          "AI productivity workspace for South African farm teams: chat, task planning, research, meeting notes, and email drafting.",
+          "Your farm AI workspace: chat, plan tasks, read research, summarize meetings, draft emails, and track stock.",
       },
-      { property: "og:title", content: "Agri-Assist Workspace" },
+      { property: "og:title", content: "Dashboard | Agri-Assist Workspace" },
       {
         property: "og:description",
         content:
-          "AI productivity workspace for South African farm teams: chat, task planning, research, meeting notes, and email drafting.",
+          "Your farm AI workspace: chat, plan tasks, read research, summarize meetings, draft emails, and track stock.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Dashboard | Agri-Assist Workspace" },
+      { name: "twitter:description", content: "Your farm AI workspace: chat, plan tasks, read research, summarize meetings, draft emails, and track stock." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2a8734bc-b17f-41e4-87ee-257051cb56ca/id-preview-9a8ce4e8--a8e44888-2699-4fda-b229-c12485bafa84.lovable.app-1784796420421.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2a8734bc-b17f-41e4-87ee-257051cb56ca/id-preview-9a8ce4e8--a8e44888-2699-4fda-b229-c12485bafa84.lovable.app-1784796420421.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
