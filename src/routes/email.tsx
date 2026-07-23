@@ -23,6 +23,7 @@ type Email = { id: string; brief: string; tone: string; subject: string; body: s
 function EmailPage() {
   const gen = useServerFn(generateEmail);
   const upd = useServerFn(updateEmail);
+  const list = useServerFn(listEmails);
 
   const [brief, setBrief] = useState("");
   const [tone, setTone] = useState<"Formal" | "Friendly" | "Persuasive">("Friendly");
@@ -35,12 +36,7 @@ function EmailPage() {
   const [copied, setCopied] = useState(false);
 
   const loadHistory = () => {
-    supabase
-      .from("emails")
-      .select("id, brief, tone, subject, body, created_at")
-      .order("created_at", { ascending: false })
-      .limit(10)
-      .then(({ data }) => setHistory((data as Email[]) ?? []));
+    list().then((data) => setHistory((data as Email[]) ?? []));
   };
   useEffect(loadHistory, []);
 
