@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { generateEmail, updateEmail } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { generateEmail, updateEmail, listEmails } from "@/lib/ai.functions";
 import { Sparkles, Copy, RefreshCw, Save } from "lucide-react";
 
 export const Route = createFileRoute("/email")({
