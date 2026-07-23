@@ -121,6 +121,7 @@ function StructuredReply({ data }: { data: Structured }) {
 
 function ChatPage() {
   const send = useServerFn(chatSend);
+  const listMsgs = useServerFn(listChatMessages);
   const { province } = useProvince();
 
   const [field, setField] = useState("");
@@ -139,11 +140,7 @@ function ChatPage() {
   }, [messages, loading]);
 
   const refresh = async (tid: string) => {
-    const { data } = await supabase
-      .from("chat_messages")
-      .select("id, role, content")
-      .eq("thread_id", tid)
-      .order("created_at");
+    const data = await listMsgs({ data: { threadId: tid } });
     setMessages((data as Msg[]) ?? []);
   };
 
