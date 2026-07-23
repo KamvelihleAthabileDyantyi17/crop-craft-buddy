@@ -52,12 +52,9 @@ function StockPage() {
   const [tab, setTab] = useState<"animals" | "grain">("animals");
   const [err, setErr] = useState("");
 
+  const list = useServerFn(listStockEntries);
   const refresh = async () => {
-    const { data } = await supabase
-      .from("stock_entries")
-      .select("*")
-      .order("entry_month", { ascending: false })
-      .order("created_at", { ascending: false });
+    const data = await list();
     setEntries((data as Entry[]) ?? []);
   };
   useEffect(() => { refresh(); }, []);
