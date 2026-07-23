@@ -1,52 +1,136 @@
-<div class="card-surface p-6">
-  
-  <!-- Welcome Banner -->
-  <div class="hero-dots mb-6">
-    <div class="hero-dots-inner"></div>
-    <div class="relative z-10">
-      <h1 class="text-xl md:text-2xl font-semibold mb-2 text-foreground">Welcome back</h1>
-      <p class="text-sm md:text-base text-soft max-w-md m-0">Five AI helpers ready for your day on the farm. Pick where to start.</p>
-    </div>
-  </div>
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource/commit-mono/400.css";
+@import "@fontsource/commit-mono/500.css";
+@import "@fontsource/commit-mono/600.css";
+@import "@fontsource/commit-mono/700.css";
 
-  <!-- AI Helpers Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    
-    <!-- AI Chatbot Card -->
-    <div class="accent-card accent-bar-green tap-target flex flex-col justify-center cursor-pointer hover:bg-surface-alt">
-      <div class="flex items-center gap-2 mb-2">
-        <i class="ti ti-message-circle text-primary text-lg" aria-hidden="true"></i>
-        <span class="font-medium text-foreground">AI chatbot</span>
-      </div>
-      <p class="text-sm text-soft m-0">Ask about crop health, pests, weather prep.</p>
-    </div>
+@theme inline {
+  --font-sans: "Commit Mono", ui-monospace, monospace;
+  --font-mono: "Commit Mono", ui-monospace, monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--soft);
+  --color-faint: var(--faint);
+  --color-soft: var(--soft);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--surface-alt);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: #0D100A;
+  --color-secondary: var(--surface-alt);
+  --color-secondary-foreground: var(--foreground);
+  --color-accent: var(--amber);
+  --color-accent-foreground: #11140D;
+  --color-destructive: var(--rust);
+  --color-destructive-foreground: #ECEADF;
+  --color-border: var(--border-color);
+  --color-input: var(--surface-alt);
+  --color-ring: var(--primary);
+  --color-deep: var(--deep-green);
+  --color-amber: var(--amber);
+  --color-rust: var(--rust);
+}
 
-    <!-- Task Planner Card -->
-    <div class="accent-card accent-bar-amber tap-target flex flex-col justify-center cursor-pointer hover:bg-surface-alt">
-      <div class="flex items-center gap-2 mb-2">
-        <i class="ti ti-calendar text-amber text-lg" aria-hidden="true"></i>
-        <span class="font-medium text-foreground">Task planner</span>
-      </div>
-      <p class="text-sm text-soft m-0">Turn pending tasks into a weekly schedule.</p>
-    </div>
+:root {
+  --background: #11140D;
+  --surface: #1B211A;
+  --surface-alt: #232B21;
+  --sidebar-bg: #0D100A;
+  --foreground: #ECEADF;
+  --soft: #A9AF9C;
+  --faint: #6F7768;
+  --primary: #6B8F5A;
+  --deep-green: #3F5D3F;
+  --amber: #D9A24B;
+  --rust: #D97757;
+  --border-color: #2A3227;
+}
 
-    <!-- Research Assistant Card -->
-    <div class="accent-card accent-bar-blue tap-target flex flex-col justify-center cursor-pointer hover:bg-surface-alt">
-      <div class="flex items-center gap-2 mb-2">
-        <i class="ti ti-book-2 text-[#5AA8C7] text-lg" aria-hidden="true"></i>
-        <span class="font-medium text-foreground">Research assistant</span>
-      </div>
-      <p class="text-sm text-soft m-0">Look up crop science and market trends.</p>
-    </div>
+@layer base {
+  * {
+    border-color: var(--border-color);
+  }
+  html, body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: "Commit Mono", ui-monospace, monospace;
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    html, body { font-size: 17px; }
+  }
+  h1, h2, h3, h4 { color: var(--foreground); font-weight: 600; }
+  ::selection { background: var(--primary); color: #0D100A; }
+}
 
-    <!-- Meeting Notes Card -->
-    <div class="accent-card accent-bar-rust tap-target flex flex-col justify-center cursor-pointer hover:bg-surface-alt">
-      <div class="flex items-center gap-2 mb-2">
-        <i class="ti ti-clipboard-list text-rust text-lg" aria-hidden="true"></i>
-        <span class="font-medium text-foreground">Meeting notes</span>
-      </div>
-      <p class="text-sm text-soft m-0">Capture and summarize field team check-ins.</p>
-    </div>
-
-  </div>
-</div>
+@utility card-surface {
+  background-color: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.02), 0 8px 24px rgba(0,0,0,0.25);
+}
+@utility accent-card {
+  position: relative;
+  background-color: #161B14;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px 20px 20px 26px;
+  overflow: hidden;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+@utility accent-bar-green {
+  &::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--primary); box-shadow: 0 0 14px color-mix(in oklab, var(--primary) 70%, transparent); }
+}
+@utility accent-bar-amber {
+  &::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--amber); box-shadow: 0 0 14px color-mix(in oklab, var(--amber) 70%, transparent); }
+}
+@utility accent-bar-blue {
+  &::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: #5AA8C7; box-shadow: 0 0 14px color-mix(in oklab, #5AA8C7 70%, transparent); }
+}
+@utility accent-bar-rust {
+  &::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--rust); box-shadow: 0 0 14px color-mix(in oklab, var(--rust) 70%, transparent); }
+}
+@utility accent-bar-deep {
+  &::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--deep-green); box-shadow: 0 0 14px color-mix(in oklab, var(--deep-green) 70%, transparent); }
+}
+@utility hero-dots {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 32px 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(107,143,90,0.14), transparent 55%),
+    radial-gradient(circle at 85% 75%, rgba(217,162,75,0.07), transparent 55%),
+    #0F130C;
+}
+@utility hero-dots-inner {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(169,175,156,0.22) 1px, transparent 1.2px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(180deg, black, transparent 95%);
+}
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+@utility tap-target {
+  min-height: 48px;
+}
