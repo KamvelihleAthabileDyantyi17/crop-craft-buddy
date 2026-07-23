@@ -349,3 +349,67 @@ export const updateEmail = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- READ / LIST SERVER FUNCTIONS ----------
+
+export const listChatMessages = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ threadId: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("chat_messages")
+      .select("id, role, content")
+      .eq("thread_id", data.threadId)
+      .order("created_at");
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const listTasks = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ batchId: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("tasks")
+      .select("id, title, notes, day, priority, done")
+      .eq("batch_id", data.batchId)
+      .order("day_order");
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const listResearchNotes = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("research_notes")
+      .select("id, title, summary, insights, actions, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const listMeetingNotes = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("meeting_notes")
+      .select("id, title, summary, action_items, decisions, deadlines, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const listEmails = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("emails")
+      .select("id, brief, tone, subject, body, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });

@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { summarizeMeeting } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { summarizeMeeting, listMeetingNotes } from "@/lib/ai.functions";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/meetings")({
@@ -31,6 +30,7 @@ type Note = {
 
 function MeetingsPage() {
   const summarize = useServerFn(summarizeMeeting);
+  const list = useServerFn(listMeetingNotes);
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [current, setCurrent] = useState<Note | null>(null);
@@ -39,12 +39,7 @@ function MeetingsPage() {
   const [err, setErr] = useState("");
 
   const loadHistory = () => {
-    supabase
-      .from("meeting_notes")
-      .select("id, title, summary, action_items, decisions, deadlines, created_at")
-      .order("created_at", { ascending: false })
-      .limit(10)
-      .then(({ data }) => setHistory((data as Note[]) ?? []));
+    list().then((data) => setHistory((data as Note[]) ?? []));
   };
   useEffect(loadHistory, []);
 

@@ -4,8 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { chatSend } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { chatSend, listChatMessages } from "@/lib/ai.functions";
 import { useProvince } from "@/hooks/use-province";
 import { Send, MapPin, Sprout, Shield, Leaf } from "lucide-react";
 
@@ -122,6 +121,7 @@ function StructuredReply({ data }: { data: Structured }) {
 
 function ChatPage() {
   const send = useServerFn(chatSend);
+  const listMsgs = useServerFn(listChatMessages);
   const { province } = useProvince();
 
   const [field, setField] = useState("");
@@ -140,11 +140,7 @@ function ChatPage() {
   }, [messages, loading]);
 
   const refresh = async (tid: string) => {
-    const { data } = await supabase
-      .from("chat_messages")
-      .select("id, role, content")
-      .eq("thread_id", tid)
-      .order("created_at");
+    const data = await listMsgs({ data: { threadId: tid } });
     setMessages((data as Msg[]) ?? []);
   };
 

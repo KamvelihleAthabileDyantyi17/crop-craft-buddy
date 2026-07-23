@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Input, Select, Label, ErrorText } from "@/components/ui-bits";
-import { addStockEntry, deleteStockEntry } from "@/lib/stock.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { addStockEntry, deleteStockEntry, listStockEntries } from "@/lib/stock.functions";
 import { Plus, Trash2, PackageOpen, Beef, Wheat, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/stock")({
@@ -53,12 +52,9 @@ function StockPage() {
   const [tab, setTab] = useState<"animals" | "grain">("animals");
   const [err, setErr] = useState("");
 
+  const list = useServerFn(listStockEntries);
   const refresh = async () => {
-    const { data } = await supabase
-      .from("stock_entries")
-      .select("*")
-      .order("entry_month", { ascending: false })
-      .order("created_at", { ascending: false });
+    const data = await list();
     setEntries((data as Entry[]) ?? []);
   };
   useEffect(() => { refresh(); }, []);

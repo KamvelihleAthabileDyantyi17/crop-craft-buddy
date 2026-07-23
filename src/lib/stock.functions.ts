@@ -31,3 +31,15 @@ export const deleteStockEntry = createServerFn({ method: "POST" })
     await supabaseAdmin.from("stock_entries").delete().eq("id", data.id);
     return { ok: true };
   });
+
+export const listStockEntries = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("stock_entries")
+      .select("*")
+      .order("entry_month", { ascending: false })
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });

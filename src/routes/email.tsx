@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { generateEmail, updateEmail } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { generateEmail, updateEmail, listEmails } from "@/lib/ai.functions";
 import { Sparkles, Copy, RefreshCw, Save } from "lucide-react";
 
 export const Route = createFileRoute("/email")({
@@ -24,6 +23,7 @@ type Email = { id: string; brief: string; tone: string; subject: string; body: s
 function EmailPage() {
   const gen = useServerFn(generateEmail);
   const upd = useServerFn(updateEmail);
+  const list = useServerFn(listEmails);
 
   const [brief, setBrief] = useState("");
   const [tone, setTone] = useState<"Formal" | "Friendly" | "Persuasive">("Friendly");
@@ -36,12 +36,7 @@ function EmailPage() {
   const [copied, setCopied] = useState(false);
 
   const loadHistory = () => {
-    supabase
-      .from("emails")
-      .select("id, brief, tone, subject, body, created_at")
-      .order("created_at", { ascending: false })
-      .limit(10)
-      .then(({ data }) => setHistory((data as Email[]) ?? []));
+    list().then((data) => setHistory((data as Email[]) ?? []));
   };
   useEffect(loadHistory, []);
 

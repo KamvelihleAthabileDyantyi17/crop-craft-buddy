@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { analyzeResearch } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { analyzeResearch, listResearchNotes } from "@/lib/ai.functions";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/research")({
@@ -30,6 +29,7 @@ type Note = {
 
 function ResearchPage() {
   const analyze = useServerFn(analyzeResearch);
+  const list = useServerFn(listResearchNotes);
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [current, setCurrent] = useState<Note | null>(null);
@@ -38,12 +38,7 @@ function ResearchPage() {
   const [err, setErr] = useState("");
 
   const loadHistory = () => {
-    supabase
-      .from("research_notes")
-      .select("id, title, summary, insights, actions, created_at")
-      .order("created_at", { ascending: false })
-      .limit(10)
-      .then(({ data }) => setHistory((data as Note[]) ?? []));
+    list().then((data) => setHistory((data as Note[]) ?? []));
   };
   useEffect(loadHistory, []);
 

@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, PriorityPill, ErrorText, Loader } from "@/components/ui-bits";
-import { planTasks, updateTask, deleteTask } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { planTasks, updateTask, deleteTask, listTasks } from "@/lib/ai.functions";
 import { Sparkles, Trash2, Save } from "lucide-react";
 
 export const Route = createFileRoute("/planner")({
@@ -28,6 +27,7 @@ function PlannerPage() {
   const plan = useServerFn(planTasks);
   const update = useServerFn(updateTask);
   const remove = useServerFn(deleteTask);
+  const list = useServerFn(listTasks);
 
   const [text, setText] = useState("");
   const [batchId, setBatchId] = useState<string | null>(null);
@@ -38,12 +38,7 @@ function PlannerPage() {
 
   useEffect(() => {
     if (!batchId) return;
-    supabase
-      .from("tasks")
-      .select("id, title, notes, day, priority, done")
-      .eq("batch_id", batchId)
-      .order("day_order")
-      .then(({ data }) => setTasks((data as Task[]) ?? []));
+    list({ data: { batchId } }).then((data) => setTasks((data as Task[]) ?? []));
   }, [batchId]);
 
   const generate = async () => {
