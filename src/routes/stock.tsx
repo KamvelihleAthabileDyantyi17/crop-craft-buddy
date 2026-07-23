@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Input, Select, Label, ErrorText } from "@/components/ui-bits";
-import { addStockEntry, deleteStockEntry } from "@/lib/stock.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { addStockEntry, deleteStockEntry, listStockEntries } from "@/lib/stock.functions";
 import { Plus, Trash2, PackageOpen, Beef, Wheat, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/stock")({
