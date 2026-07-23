@@ -32,8 +32,7 @@ export const deleteStockEntry = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-import { createServerFn as _csf2 } from "@tanstack/react-start";
-export const listStockEntries = _csf2({ method: "GET" })
+export const listStockEntries = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
