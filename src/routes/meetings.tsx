@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { summarizeMeeting } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { summarizeMeeting, listMeetingNotes } from "@/lib/ai.functions";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/meetings")({
