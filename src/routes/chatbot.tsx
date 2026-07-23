@@ -4,8 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, Button, Textarea, Input, Select, Label, ErrorText, Loader } from "@/components/ui-bits";
-import { chatSend } from "@/lib/ai.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { chatSend, listChatMessages } from "@/lib/ai.functions";
 import { useProvince } from "@/hooks/use-province";
 import { Send, MapPin, Sprout, Shield, Leaf } from "lucide-react";
 
