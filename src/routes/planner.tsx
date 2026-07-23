@@ -27,6 +27,7 @@ function PlannerPage() {
   const plan = useServerFn(planTasks);
   const update = useServerFn(updateTask);
   const remove = useServerFn(deleteTask);
+  const list = useServerFn(listTasks);
 
   const [text, setText] = useState("");
   const [batchId, setBatchId] = useState<string | null>(null);
@@ -37,12 +38,7 @@ function PlannerPage() {
 
   useEffect(() => {
     if (!batchId) return;
-    supabase
-      .from("tasks")
-      .select("id, title, notes, day, priority, done")
-      .eq("batch_id", batchId)
-      .order("day_order")
-      .then(({ data }) => setTasks((data as Task[]) ?? []));
+    list({ data: { batchId } }).then((data) => setTasks((data as Task[]) ?? []));
   }, [batchId]);
 
   const generate = async () => {
