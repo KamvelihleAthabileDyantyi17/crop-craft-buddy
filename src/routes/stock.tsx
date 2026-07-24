@@ -136,7 +136,7 @@ function StockPage() {
               onClick={() => setTab(t)}
               className={`tap-target px-4 rounded-[10px] text-sm font-medium inline-flex items-center gap-2 border ${
                 tab === t
-                  ? "bg-[color:var(--deep-green)] text-foreground border-[color:var(--deep-green)]"
+                  ? "accent-select text-foreground"
                   : "bg-[color:var(--surface-alt)] text-[color:var(--soft)] border-border"
               }`}
             >
