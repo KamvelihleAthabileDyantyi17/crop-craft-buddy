@@ -46,16 +46,16 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {FEATURES.map(({ to, icon: Icon, title, desc, accent }) => {
+        {FEATURES.map(({ to, icon: Icon, title, desc, accent }, idx) => {
           const color = ACCENT_HEX[accent];
           return (
-            <Link key={to} to={to} className="block group">
+            <Link key={to} to={to} className="block group card-rise" style={{ animationDelay: `${idx * 50}ms` }}>
               <div
-                className="flat-card h-full hover:bg-[color:var(--surface-alt)]"
+                className="flat-card h-full group-hover:bg-[color:var(--surface-alt)]"
                 style={{ borderLeftColor: color }}
               >
                 <Icon
-                  className="w-5 h-5 mb-3"
+                  className="w-5 h-5 mb-3 transition-transform duration-200 group-hover:scale-110"
                   strokeWidth={1.5}
                   style={{ color }}
                 />
