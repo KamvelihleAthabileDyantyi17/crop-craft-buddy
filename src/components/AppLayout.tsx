@@ -12,8 +12,11 @@ import {
   Leaf,
   MapPin,
   PackageOpen,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { PROVINCES, useProvince } from "@/hooks/use-province";
+import { useTheme } from "@/hooks/use-theme";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -27,13 +30,20 @@ const NAV = [
 
 function ProvincePicker({ compact = false }: { compact?: boolean }) {
   const { province, setProvince } = useProvince();
+  const [pulse, setPulse] = useState(false);
   return (
-    <label className={`flex items-center gap-2 rounded-[10px] border border-border bg-[color:var(--surface-alt)] px-3 ${compact ? "h-10" : "h-11"} text-sm`}>
+    <label
+      className={`flex items-center gap-2 rounded-[10px] border accent-select px-3 ${compact ? "h-10" : "h-11"} text-sm transition-all ${pulse ? "scale-[1.02]" : ""}`}
+    >
       <MapPin className="w-4 h-4 text-primary" />
       <span className="text-[color:var(--soft)] hidden sm:inline">Location</span>
       <select
         value={province}
-        onChange={(e) => setProvince(e.target.value)}
+        onChange={(e) => {
+          setProvince(e.target.value);
+          setPulse(true);
+          setTimeout(() => setPulse(false), 220);
+        }}
         className="bg-transparent focus:outline-none text-foreground pr-1"
       >
         {PROVINCES.map((p) => (
@@ -41,6 +51,20 @@ function ProvincePicker({ compact = false }: { compact?: boolean }) {
         ))}
       </select>
     </label>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  return (
+    <button
+      onClick={toggle}
+      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className="tap-target min-w-11 h-11 px-3 flex items-center justify-center gap-2 rounded-[10px] border border-border bg-[color:var(--surface-alt)] text-[color:var(--soft)] hover:text-foreground hover:bg-surface text-sm"
+    >
+      {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      <span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"}</span>
+    </button>
   );
 }
 
@@ -58,6 +82,7 @@ export function AppLayout({ children, title }: { children: ReactNode; title: str
         </div>
         <div className="flex items-center gap-2">
           <ProvincePicker compact />
+          <ThemeToggle />
           <button
             onClick={() => setOpen(!open)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -87,9 +112,9 @@ export function AppLayout({ children, title }: { children: ReactNode; title: str
                 key={to}
                 to={to}
                 onClick={() => setOpen(false)}
-                className={`tap-target flex items-center gap-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                className={`tap-target flex items-center gap-3 px-4 rounded-md text-sm font-medium duration-200 ease-out ${
                   active
-                    ? "bg-[color:var(--deep-green)] text-foreground"
+                    ? "accent-select text-foreground"
                     : "text-[color:var(--soft)] hover:bg-surface hover:text-foreground"
                 }`}
               >
@@ -103,9 +128,12 @@ export function AppLayout({ children, title }: { children: ReactNode; title: str
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="hidden md:flex items-center justify-between px-8 pt-6">
+        <div className="hidden md:flex items-center justify-between px-8 pt-6 gap-3">
           <div />
-          <ProvincePicker />
+          <div className="flex items-center gap-2">
+            <ProvincePicker />
+            <ThemeToggle />
+          </div>
         </div>
         <main className="flex-1 px-4 md:px-8 py-6 md:py-6 max-w-5xl w-full mx-auto">
           <h1 className="text-2xl md:text-3xl font-semibold mb-6">{title}</h1>

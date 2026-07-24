@@ -56,23 +56,40 @@
   --amber: #D9A24B;
   --rust: #D97757;
   --border-color: #2A3227;
+  --accent-soft: rgba(107, 143, 90, 0.16);
+}
+
+html.light {
+  --background: #F6F4EC;
+  --surface: #FFFFFF;
+  --surface-alt: #EFEDE3;
+  --sidebar-bg: #ECEAE0;
+  --foreground: #1E241A;
+  --soft: #5B6353;
+  --faint: #8A927E;
+  --primary: #5E8250;
+  --deep-green: #3F5D3F;
+  --amber: #B8842E;
+  --rust: #B85C3C;
+  --border-color: #D7D4C6;
+  --accent-soft: rgba(94, 130, 80, 0.14);
 }
 
 @layer base {
-  * {
-    border-color: var(--border-color);
-  }
+  * { border-color: var(--border-color); }
   html, body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: "Commit Mono", ui-monospace, monospace;
     font-size: 16px;
+    transition: background-color 250ms ease, color 250ms ease;
   }
-  @media (min-width: 768px) {
-    html, body { font-size: 17px; }
-  }
+  @media (min-width: 768px) { html, body { font-size: 17px; } }
   h1, h2, h3, h4 { color: var(--foreground); font-weight: 600; }
   ::selection { background: var(--primary); color: #0D100A; }
+  button, a, select, input, textarea {
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, filter 180ms ease;
+  }
 }
 
 @utility card-surface {
@@ -88,7 +105,17 @@
   border-left: 3px solid var(--border-color);
   border-radius: 12px;
   padding: 20px 20px 20px 22px;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition: background-color 180ms ease-out, border-color 180ms ease-out, transform 180ms ease-out, filter 180ms ease-out;
+  will-change: transform;
+}
+.flat-card:hover { transform: translateY(-2px); filter: brightness(1.06); }
+@utility card-rise {
+  opacity: 0;
+  animation: fade-in 280ms ease-out forwards;
+}
+@utility accent-select {
+  background-color: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--primary) 45%, var(--border-color));
 }
 @utility accent-card {
   position: relative;
