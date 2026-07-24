@@ -32,6 +32,14 @@ const FEATURES: { to: string; icon: typeof MessageCircle; title: string; desc: s
   { to: "/stock", icon: PackageOpen, title: "Stock tracker", desc: "Animals and grain — sold vs bought, monthly.", accent: "amber" },
 ];
 
+const SHORTCUTS: { to: string; icon: typeof MessageCircle; label: string; accent: Accent }[] = [
+  { to: "/research", icon: BookOpen, label: "Research", accent: "blue" },
+  { to: "/planner", icon: CalendarCheck, label: "Planner", accent: "amber" },
+  { to: "/meetings", icon: ClipboardList, label: "Meetings", accent: "rust" },
+  { to: "/chatbot", icon: MessageCircle, label: "Chatbot", accent: "green" },
+  { to: "/email", icon: Mail, label: "Email", accent: "green" },
+];
+
 function Dashboard() {
   return (
     <AppLayout title="Welcome back">
