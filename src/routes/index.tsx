@@ -53,6 +53,8 @@ function Dashboard() {
         </div>
       </div>
 
+      <MobileShortcutsBar />
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {FEATURES.map(({ to, icon: Icon, title, desc, accent }, idx) => {
           const color = ACCENT_HEX[accent];
@@ -75,5 +77,27 @@ function Dashboard() {
         })}
       </div>
     </AppLayout>
+  );
+}
+
+function MobileShortcutsBar() {
+  return (
+    <div className="md:hidden sticky top-0 z-10 -mx-4 px-4 py-3 mb-4 bg-[color:var(--background)] border-y border-border">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        {SHORTCUTS.map(({ to, icon: Icon, label, accent }) => {
+          const color = ACCENT_HEX[accent];
+          return (
+            <Link
+              key={to}
+              to={to}
+              className="flex flex-col items-center justify-center gap-1 min-w-[70px] p-2 rounded-xl bg-[color:var(--surface)] border border-border active:scale-95 transition-transform duration-150"
+            >
+              <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color }} />
+              <span className="text-[10px] text-[color:var(--soft)] whitespace-nowrap">{label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
