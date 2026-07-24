@@ -168,3 +168,8 @@ html.light {
 @utility tap-target {
   min-height: 48px;
 }
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

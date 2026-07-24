@@ -32,6 +32,14 @@ const FEATURES: { to: string; icon: typeof MessageCircle; title: string; desc: s
   { to: "/stock", icon: PackageOpen, title: "Stock tracker", desc: "Animals and grain — sold vs bought, monthly.", accent: "amber" },
 ];
 
+const SHORTCUTS: { to: string; icon: typeof MessageCircle; label: string; accent: Accent }[] = [
+  { to: "/research", icon: BookOpen, label: "Research", accent: "blue" },
+  { to: "/planner", icon: CalendarCheck, label: "Planner", accent: "amber" },
+  { to: "/meetings", icon: ClipboardList, label: "Meetings", accent: "rust" },
+  { to: "/chatbot", icon: MessageCircle, label: "Chatbot", accent: "green" },
+  { to: "/email", icon: Mail, label: "Email", accent: "green" },
+];
+
 function Dashboard() {
   return (
     <AppLayout title="Welcome back">
@@ -44,6 +52,8 @@ function Dashboard() {
           </p>
         </div>
       </div>
+
+      <MobileShortcutsBar />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {FEATURES.map(({ to, icon: Icon, title, desc, accent }, idx) => {
@@ -67,5 +77,27 @@ function Dashboard() {
         })}
       </div>
     </AppLayout>
+  );
+}
+
+function MobileShortcutsBar() {
+  return (
+    <div className="md:hidden sticky top-0 z-10 -mx-4 px-4 py-3 mb-4 bg-[color:var(--background)] border-y border-border">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        {SHORTCUTS.map(({ to, icon: Icon, label, accent }) => {
+          const color = ACCENT_HEX[accent];
+          return (
+            <Link
+              key={to}
+              to={to}
+              className="flex flex-col items-center justify-center gap-1 min-w-[70px] p-2 rounded-xl bg-[color:var(--surface)] border border-border active:scale-95 transition-transform duration-150"
+            >
+              <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color }} />
+              <span className="text-[10px] text-[color:var(--soft)] whitespace-nowrap">{label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
